@@ -1,0 +1,49 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack for S3 bucket used for Kinesis Firehose delivery
+
+
+Parameters:
+  S3Bucket:
+    Default: test-cfn-061118
+    Type: String
+    Description: Kinesis S3 data bucket name for source AWS account
+  SourceAccount:
+    Default: 176246093417
+    Type: Number
+    Description: Source AWS account number
+
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3Bucket
+      AccessControl: BucketOwnerFullControl
+      VersioningConfiguration:
+        Status: Enabled
+    DeletionPolicy: Retain
+
+  DataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DataBucket
+      PolicyDocument:
+        Id: S3BucketPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: BucketObjectAccessPolicy
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${SourceAccount}:root
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:GetBucketPolicy
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !Sub arn:aws:s3:::${S3Bucket}
+              - !Sub arn:aws:s3:::${S3Bucket}/*
