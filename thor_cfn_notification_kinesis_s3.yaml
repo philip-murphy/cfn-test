@@ -2,8 +2,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Stack for S3 bucket used for Kinesis Firehose delivery
 
-# adding test for web hook
-
 Parameters:
   S3Bucket:
     Default: test-cfn-061118
